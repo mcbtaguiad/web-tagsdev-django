@@ -1059,10 +1059,10 @@ body{
 }
 
 [data-theme="light"] #sunmoon:before{
-    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f185"; 
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f186"; 
 }
 [data-theme="dark"] #sunmoon:before{
-    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f186"; 
+    font-family: "Font Awesome 5 Free"; font-weight: 900; content: "\f185"; 
 }
 
 

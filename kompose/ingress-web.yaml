@@ -1,0 +1,35 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  namespace: web-tagsdev
+  name: tagsdev-ingress
+  annotations:
+    #cert-manager.io/cluster-issuer: "letsencrypt-staging"
+    #cert-manager.io/issue-temporary-certificate: "true"
+    #acme.cert-manager.io/http01-edit-in-place: "true"
+    kubernetes.io/ingress.class: "haproxy"
+    #nginx.ingress.kubernetes.io/proxy-body-size:  "50m"
+
+spec:
+  tls:
+  - hosts:
+      - mark.tagsdev.click
+    secretName: tagsdev-tls
+  rules:
+  - host: mark.tagsdev.click
+    http:
+      paths:
+      - path: /
+        #pathType: ImplementationSpecific
+        pathType: Prefix
+        backend:
+          service: 
+            name: nginx
+            port:
+              number: 80
+
+
+
+---
+
