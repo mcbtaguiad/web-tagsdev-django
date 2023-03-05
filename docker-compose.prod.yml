@@ -3,6 +3,7 @@ version: '3.3'
 services:
   web:
     build: 
+      image: docker.io/mcbtaguiad/tagsdev_web:v1.1.1
       context: ./app
       dockerfile: Dockerfile.prod
     command: gunicorn mysite.wsgi:application --bind 0.0.0.0:8000
