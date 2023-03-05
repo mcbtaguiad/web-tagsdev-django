@@ -1,11 +1,11 @@
 apiVersion: v1
 data:
-  POSTGRES_DB: django
+  POSTGRES_DB: jeremie
   POSTGRES_PASSWORD: Therealdeal1
-  POSTGRES_USER: mcbtaguiad
+  POSTGRES_USER: postgres
 kind: ConfigMap
 metadata:
   creationTimestamp: null
   labels:
-    io.kompose.service: db-env-prod-db
+    app: db-env-prod-db
   name: env-prod-db

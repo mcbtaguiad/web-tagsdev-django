@@ -1,0 +1,69 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert -f docker-compose.prod.yml
+    kompose.version: 1.26.1 (a9d05d509)
+  creationTimestamp: null
+  labels:
+    postgresql: web
+  name: web
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      postgresql: web
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        postgresql: web
+    spec:
+      affinity:
+        nodeAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+            - matchExpressions:
+              - key: kubernetes.io/os
+                operator: In
+                values:
+                - linux
+          preferredDuringSchedulingIgnoredDuringExecution:
+          - weight: 20
+            preference:
+              matchExpressions:
+              - key: kubernetes.io/role
+                operator: In
+                values:
+                - 'worker'
+          - weight: 10
+            preference:
+              matchExpressions:
+              - key: node-role.kubernetes.io/master
+                operator: In
+                values:
+                - 'true'
+      containers:
+        - args:
+            - gunicorn
+            - mysite.wsgi:application
+            - --bind
+            - 0.0.0.0:8000
+          image: mcbtaguiad/tagsdev_web:v1.1.1
+          name: web
+          ports:
+            - containerPort: 8000
+          resources: {}
+          volumeMounts:
+            - mountPath: /home/app/web/staticfiles
+              name: static-volume
+          envFrom:
+            - configMapRef:
+                name: web-env-prod
+      restartPolicy: Always
+      volumes:
+        - name: static-volume
+          persistentVolumeClaim:
+            claimName: static-volume
+status: {}
