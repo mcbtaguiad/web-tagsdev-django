@@ -11,7 +11,7 @@ data:
   SECRET_KEY: Therealdeal1
   SQL_DATABASE: mark
   SQL_ENGINE: django.db.backends.postgresql
-  SQL_HOST: postgres.db-prod.svc.cluster.local
+  SQL_HOST: pgpool.db-prod.svc.cluster.local
   SQL_PASSWORD: Therealdeal1
   SQL_PORT: "5432"
   SQL_USER: postgres

@@ -16,6 +16,10 @@ spec:
       labels:
         app: web-mark
     spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -26,14 +30,14 @@ spec:
                 values:
                 - linux
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 15
+          - weight: 10
             preference:
               matchExpressions:
               - key: kubernetes.io/role
                 operator: In
                 values:
                 - 'worker'
-          - weight: 10
+          - weight: 5
             preference:
               matchExpressions:
               - key: node-role.kubernetes.io/master
@@ -43,21 +47,21 @@ spec:
           - weight: 5
             preference:
               matchExpressions:
-              - key: disk
-                operator: In
-                values:
-                - 'hdd'
-          - weight: 5
-            preference:
-              matchExpressions:
-              - key: corecount
+              - key: core
                 operator: In
                 values:
                 - '2'
           - weight: 5
             preference:
               matchExpressions:
-              - key: corecount
+              - key: core
+                operator: In
+                values:
+                - '1'
+          - weight: 5
+            preference:
+              matchExpressions:
+              - key: disk
                 operator: In
                 values:
                 - 'ssd'
@@ -67,19 +71,19 @@ spec:
             - mysite.wsgi:application
             - --bind
             - 0.0.0.0:8000
-          image: mcbtaguiad/tagsdev_web:v1.1.1
+          image: mcbtaguiad/tagsdev_web:latest
           imagePullPolicy: Always
           name: web-mark
           ports:
             - containerPort: 8000
-          # volumeMounts:
-          #   - mountPath: /home/app/web/staticfiles
-          #     name: static-volume
+          volumeMounts:
+            - mountPath: /home/app/web/staticfiles
+              name: web-prod
           envFrom:
             - configMapRef:
                 name: web-env-prod
       restartPolicy: Always
-      # volumes:
-      #   - name: static-volume
-      #     persistentVolumeClaim:
-      #       claimName: static-volume
+      volumes:
+        - name: web-prod
+          persistentVolumeClaim:
+            claimName: web-mark-pvc
