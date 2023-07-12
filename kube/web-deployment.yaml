@@ -1,25 +1,25 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  annotations:
-    kompose.cmd: kompose convert -f docker-compose.prod.yml
-    kompose.version: 1.26.1 (a9d05d509)
-  creationTimestamp: null
   labels:
-    postgresql: web
-  name: web
+    app: web-mark
+  name: web-mark
 spec:
   replicas: 1
   selector:
     matchLabels:
-      postgresql: web
+      app: web-mark
   strategy:
     type: Recreate
   template:
     metadata:
       labels:
-        postgresql: web
+        app: web-mark
     spec:
+      securityContext:
+        runAsUser: 0
+        runAsGroup: 0
+        fsGroup: 0
       affinity:
         nodeAffinity:
           requiredDuringSchedulingIgnoredDuringExecution:
@@ -30,40 +30,60 @@ spec:
                 values:
                 - linux
           preferredDuringSchedulingIgnoredDuringExecution:
-          - weight: 20
+          - weight: 10
             preference:
               matchExpressions:
               - key: kubernetes.io/role
                 operator: In
                 values:
                 - 'worker'
-          - weight: 10
+          - weight: 5
             preference:
               matchExpressions:
               - key: node-role.kubernetes.io/master
                 operator: In
                 values:
                 - 'true'
+          - weight: 5
+            preference:
+              matchExpressions:
+              - key: core
+                operator: In
+                values:
+                - '2'
+          - weight: 5
+            preference:
+              matchExpressions:
+              - key: core
+                operator: In
+                values:
+                - '1'
+          - weight: 5
+            preference:
+              matchExpressions:
+              - key: disk
+                operator: In
+                values:
+                - 'ssd'
       containers:
         - args:
             - gunicorn
             - mysite.wsgi:application
             - --bind
             - 0.0.0.0:8000
-          image: mcbtaguiad/tagsdev_web:v1.1.1
-          name: web
+          image: mcbtaguiad/tagsdev_web:latest
+          imagePullPolicy: Always
+          name: web-mark
           ports:
             - containerPort: 8000
-          resources: {}
           volumeMounts:
             - mountPath: /home/app/web/staticfiles
-              name: static-volume
+              name: web-prod
           envFrom:
             - configMapRef:
                 name: web-env-prod
       restartPolicy: Always
       volumes:
-        - name: static-volume
+        - name: web-prod
           persistentVolumeClaim:
-            claimName: static-volume
-status: {}
+            claimName: web-mark-pvc
